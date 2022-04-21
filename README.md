@@ -29,7 +29,7 @@
 
 由于dwa算法的缺陷，容易陷入局部最优解，改进的方法是在上述情况下重新规划路径，实现动态dwa
 
-## 移植到ros
+## Gazebo仿真环境
 ![1](https://user-images.githubusercontent.com/85838942/164475980-2c5ee1d4-1a9c-4fde-b382-41fcfbcb8b1d.png)
 ![2](https://user-images.githubusercontent.com/85838942/164475994-257a65a5-8b61-4313-9155-887bef3fd7a9.png)
 
