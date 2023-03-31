@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<!-- Revolute-Revolute Manipulator -->
+<robot name="course_agv" 
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="PI" value="3.1415926535897931"/>
+    <xacro:property name="mass" value="30" />
+    <xacro:property name="length" value="0.5" />
+    <xacro:property name="width" value="0.2" />
+    <xacro:property name="height" value="0.11" />
+    <xacro:property name="chassis_height" value="0.005" />
+    <xacro:property name="caster_radius" value="${chassis_height/2}" />
+    <xacro:property name="wheel_mass" value="0.1" />
+    <xacro:property name="wheel_radius" value="0.08" />
+    <xacro:property name="wheel_thickness" value="${wheel_radius/3}" />
+    <xacro:property name="center_span" value="0.0" />
+
+    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+    <xacro:include filename="$(find course_agv_description)/urdf/course_agv.gazebo" />
+    <!-- Import Rviz colors -->
+    <xacro:include filename="$(find course_agv_description)/urdf/materials.xacro" />
+
+    <!-- joints -->
+    <joint name="course_agv__left_wheel_joint" type="continuous">
+        <parent link="robot_base"/>
+        <child link="course_agv__left_wheel"/>
+        <origin rpy="0 ${PI/2.0} ${PI/2.0}" xyz="0.0 ${(width / 2.0 + wheel_thickness / 2.0)} ${wheel_radius}"/>
+        <axis xyz="9.00000000e-05   9.00000000e-05   1.00000000e+00"/>
+        <limit effort="100" lower="0" upper="0" velocity="10"/>
+    </joint>
+    <joint name="course_agv__right_wheel_joint" type="continuous">
+        <parent link="robot_base"/>
+        <child link="course_agv__right_wheel"/>
+        <origin rpy="0 ${PI/2.0} ${PI/2.0}" xyz="0.0 ${-(width / 2.0 + wheel_thickness / 2.0)}  ${wheel_radius}"/>
+        <axis xyz="9.00000000e-05   9.00000000e-05   1.00000000e+00"/>
+        <limit effort="100" lower="0" upper="0" velocity="10"/>
+    </joint>
+    <joint name="course_agv__hokuyo_joint" type="fixed">
+        <parent link="robot_base"/>
+        <child link="course_agv__hokuyo__link"/>
+        <origin rpy="0  0  0" xyz="0.0 0.0 ${height+chassis_height+0.0495}"/>
+        <axis xyz="0  0  0"/>
+        <limit effort="0" lower="0" upper="0" velocity="0"/>
+    </joint>
+    <joint name="course_agv__imu_joint" type="fixed">
+        <parent link="robot_base"/>
+        <child link="course_agv__imu"/>
+        <origin rpy="0  0  0" xyz="0.0 0.0 ${height/2+chassis_height}"/>
+        <axis xyz="0  0  0"/>
+        <limit effort="0" lower="0" upper="0" velocity="0"/>
+    </joint>
+    <joint name="course_agv__chassis_joint" type="fixed">
+        <parent link="robot_base" />
+        <child link="robot_chassis" />
+        <origin xyz="${-center_span} 0.0 0.0" />
+        <!-- <origin xyz="0.0 0.0 0.0" /> -->
+    </joint>
+
+    <link name="robot_base">
+    </link>
+    <!-- chassis -->
+    <link name="robot_chassis">
+        <inertial>
+            <mass value="${mass}"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="${mass / 12.0 * (width*width + height*height)}" ixy="0" ixz="0" iyy="${mass / 12.0 * (length*length + height*height)}" iyz="0" izz="${mass / 12.0 * (width*width + length*length)}"/>
+        </inertial>
+        <collision name="course_agv__collision">
+            <origin rpy="0 0 0" xyz="${-(length/2-wheel_radius)+center_span} 0.0 ${height/2.0+chassis_height}"/>
+            <geometry>
+                <box size="${length} ${width} ${height}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="${-(length/2-wheel_radius)+center_span} 0.0 ${height/2.0+chassis_height}"/>
+            <geometry>
+                <box size="${length} ${width} ${height}"/>
+            </geometry>
+            <material name="yellow" />
+        </visual>
+        <collision name="course_agv__left_caster_collision">
+            <origin rpy="0 0 0" xyz="${-(length-wheel_radius-center_span)} ${width/2-caster_radius} ${caster_radius}"/>
+            <geometry>
+                <sphere radius="${caster_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="${-(length-wheel_radius-center_span)} ${width/2-caster_radius} ${caster_radius}"/>
+            <geometry>
+                <sphere radius="${caster_radius}"/>
+            </geometry>
+            <material name="yellow" />
+        </visual>
+        <collision name="course_agv__right_caster_collision">
+            <origin rpy="0 0 0" xyz="${-(length-wheel_radius-center_span-caster_radius)} ${-(width/2-caster_radius)} ${caster_radius}"/>
+            <geometry>
+                <sphere radius="${caster_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="${-(length-wheel_radius-center_span-caster_radius)} ${-(width/2-caster_radius)} ${caster_radius}"/>
+            <geometry>
+                <sphere radius="${caster_radius}"/>
+            </geometry>
+            <material name="yellow" />
+        </visual>
+    </link>
+    <!-- left wheel -->
+    <link name="course_agv__left_wheel">
+        <inertial>
+            <mass value="${wheel_mass}"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <collision name="course_agv__collision">
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+            <material name="grey" />
+        </visual>
+    </link>
+    <!-- right wheel -->
+    <link name="course_agv__right_wheel">
+        <inertial>
+            <mass value="${wheel_mass}"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <collision name="course_agv__collision">
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+            <material name="grey" />
+        </visual>
+    </link>
+    <!-- hokuyo laser -->
+    <link name="course_agv__hokuyo__link">
+        <inertial>
+            <mass value="1e-5"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <collision name="course_agv__hokuyo__collision-base">
+            <origin rpy="0 0 0" xyz="0 0 -0.035"/>
+            <geometry>
+                <box size="0.05 0.05 0.041"/>
+            </geometry>
+        </collision>
+        <collision name="course_agv__hokuyo__collision-top">
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <cylinder length="0.029" radius="0.021"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0  0  0" xyz="0  0 -0.0205"/>
+            <geometry>
+                <mesh filename="package://course_agv_description/meshes/hokuyo.dae" scale="1.0 1.0 1.0"/>
+            </geometry>
+        </visual>
+    </link>
+    <!-- imu -->
+    <link name="course_agv__imu">
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.01"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.01"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+        <inertial>
+            <mass value="0.001" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+        </inertial>
+    </link>
+
+    <transmission name="tran_left_wheel">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="course_agv__left_wheel_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="motor_left">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="tran_right_wheel">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="course_agv__right_wheel_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="motor_right">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+</robot>

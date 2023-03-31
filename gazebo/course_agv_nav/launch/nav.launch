@@ -1,0 +1,14 @@
+<launch>
+    <!-- Start Simulator -->
+    <include file="$(find course_agv_gazebo)/launch/course_agv_world.launch"/>
+    <!-- Run the map server -->
+    <arg name="map_file" default="$(find course_agv_gazebo)/config/map.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+    <!-- Publish global pose -->
+    <node pkg="course_agv_gazebo" type="robot_tf.py" output="screen" name="robot_pose_tf_publisher"/>
+    <node pkg="course_agv_control" type="kinematics.py" name="kinematics_transform" ns="course_agv" output="screen"/>
+    <node pkg="course_agv_nav" type="global_planner.py" name="global_planner" ns="course_agv"  output="screen"/>
+    <node pkg="course_agv_nav" type="local_planner.py" name="local_planner" ns="course_agv" output="screen"/>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find course_agv_nav)/launch/nav.rviz"/>
+</launch>

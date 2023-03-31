@@ -1,0 +1,18 @@
+course_agv:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+  
+  # Velocity Controllers ---------------------------------------
+  left_wheel_velocity_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: course_agv__left_wheel_joint
+    # pid: {p: 100.0, i: 0.01, d: 10.0}
+  right_wheel_velocity_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: course_agv__right_wheel_joint
+    # pid: {p: 100.0, i: 0.01, d: 10.0}
+  gazebo_ros_control/pid_gains:
+    course_agv__left_wheel_joint: {p: 5.0, i: 0.1, d: 0.0}
+    course_agv__right_wheel_joint: {p: 5.0, i: 0.1, d: 0.0}

@@ -1,0 +1,15 @@
+<launch>
+    <arg name="map_file" default="$(find course_agv_gazebo)/config/map.yaml"/>
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+    <param name="robot_name" type="str" value="course_agv" />
+    <param name="link_name" type="str" value="robot_chassis" />
+
+    <node pkg="tf" type="static_transform_publisher" name="course_map_tf" args="0 0 0 0 0 0 world_base map 100" />
+    <node pkg="course_agv_gazebo" type="robot_tf.py" output="screen" name="robot_pose_tf_publisher"/>
+    <node pkg="course_agv_control" type="keyboard_velocity.py" name="keyboard_terminal" output="screen" launch-prefix="xterm -e" />
+    <node pkg="course_agv_control" type="kinematics.py" name="kinematics_transform" output="screen"/>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find course_agv_gazebo)/launch/course_agv.rviz" />
+</launch>
